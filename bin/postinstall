@@ -1,0 +1,45 @@
+#!/bin/bash
+
+set -e
+
+. ${INSTALLER_DIR}/wizard
+
+CLI="${APP_NAME}"
+
+rake_commands="db:migrate db:seed"
+
+# create attachments folder
+attachments_path=$(${CLI} config:get ATTACHMENTS_STORAGE_PATH || echo "/var/db/${APP_NAME}/files")
+mkdir -p "${attachments_path}"
+chown ${APP_USER}.${APP_GROUP} "${attachments_path}"
+${CLI} config:set ATTACHMENTS_STORAGE_PATH="${attachments_path}"
+
+# set web concurrency
+web_concurrency=$(${CLI} config:get WEB_CONCURRENCY || echo "2")
+${CLI} config:set WEB_CONCURRENCY=${web_concurrency}
+
+# set SECRET_TOKEN env variable
+secret_token=$(${CLI} config:get SECRET_TOKEN || ${CLI} run rake -s secret | tail -1)
+${CLI} config:set SECRET_TOKEN="$secret_token"
+
+# migrate
+${CLI} run rake ${rake_commands} || true
+
+sys_api_key=$(${CLI} config:get SYS_API_KEY)
+
+# set various settings
+hostname="$(wiz_get "server/hostname")"
+web_ssl="$(wiz_get "server/ssl")"
+if [ "$web_ssl" = "true" ] ; then
+	web_protocol="https"
+else
+	web_protocol="http"
+fi
+
+${CLI} run rake setting:set[host_name=${web_hostname},protocol=${web_protocol},sys_api_enabled=1,sys_api_key=${sys_api_key}] 1>/dev/null
+
+# scale
+${CLI} scale web=1 worker=1 || true
+
+# restart
+service openproject restart
