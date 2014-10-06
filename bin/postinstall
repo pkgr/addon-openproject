@@ -30,7 +30,7 @@ sys_api_key=$(${CLI} config:get SYS_API_KEY)
 # set various settings
 hostname="$(wiz_get "server/hostname")"
 web_ssl="$(wiz_get "server/ssl")"
-if [ "$web_ssl" = "true" ] ; then
+if [ "$web_ssl" = "yes" ] ; then
 	web_protocol="https"
 else
 	web_protocol="http"
