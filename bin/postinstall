@@ -39,4 +39,4 @@ ${CLI} run rake setting:set[host_name=${web_hostname},protocol=${web_protocol},s
 ${CLI} scale web=1 worker=1 || true
 
 # restart
-service openproject restart
+service ${APP_NAME} restart
