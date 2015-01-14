@@ -8,6 +8,14 @@ CLI="${APP_NAME}"
 
 rake_commands="db:migrate db:seed"
 
+# set rails_cache_store
+memcached_servers="$(${CLI} config:get MEMCACHED_SERVERS)"
+if [ -z "$memcached_servers" ]; then
+	${CLI} config:set RAILS_CACHE_STORE=file_store
+else
+	${CLI} config:set RAILS_CACHE_STORE=memcache
+fi
+
 # create attachments folder
 attachments_path=$(${CLI} config:get ATTACHMENTS_STORAGE_PATH || echo "/var/db/${APP_NAME}/files")
 mkdir -p "${attachments_path}"
