@@ -40,6 +40,18 @@ ${CLI} config:set SECRET_TOKEN="$secret_token"
 # migrate
 ${CLI} run rake ${rake_commands} || true
 
+# Avoid errors on versions < 5.0
+if [ -e "${APP_HOME}/lib/tasks/scm.rake" ]; then
+	# migrate previous repositories with reposman to managed
+	SVN_REPOSITORIES=$(${CLI} config:get SVN_REPOSITORIES || echo "")
+	if [ -n "$SVN_REPOSITORIES" ]; then
+		${CLI} run rake scm:migrate:managed["file://${SVN_REPOSITORIES}"]
+	fi
+
+	# Output any remnants of existing repositories
+	${CLI} run rake scm:find_unassociated
+fi
+
 # set various settings
 sys_api_key=$(${CLI} config:get SYS_API_KEY)
 web_protocol="$(${CLI} config:get SERVER_PROTOCOL)"
