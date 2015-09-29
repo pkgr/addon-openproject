@@ -33,8 +33,11 @@ ${CLI} config:set WEB_CONCURRENCY=${web_concurrency}
 web_timeout=$(${CLI} config:get WEB_TIMEOUT || echo "15")
 ${CLI} config:set WEB_TIMEOUT=${web_timeout}
 
-# set SECRET_TOKEN env variable
-secret_token=$(${CLI} config:get SECRET_TOKEN || ${CLI} run rake -s secret | tail -1)
+# set SECRET_KEY_BASE env variable
+secret_token=$(${CLI} config:get SECRET_KEY_BASE || ${CLI} config:get SECRET_TOKEN || ${CLI} run rake -s secret | tail -1)
+${CLI} config:set SECRET_KEY_BASE="$secret_token"
+
+# set SECRET_TOKEN env variable for backwards compatibility
 ${CLI} config:set SECRET_TOKEN="$secret_token"
 
 # migrate
