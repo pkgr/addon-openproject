@@ -48,11 +48,11 @@ if [ -e "${APP_HOME}/lib/tasks/scm.rake" ]; then
 	# migrate previous repositories with reposman to managed
 	SVN_REPOSITORIES=$(${CLI} config:get SVN_REPOSITORIES || echo "")
 	if [ -n "$SVN_REPOSITORIES" ]; then
-		${CLI} run rake scm:migrate:managed["file://${SVN_REPOSITORIES}"]
+		${CLI} run rake scm:migrate:managed["file://${SVN_REPOSITORIES}"] || true
 	fi
 
 	# Output any remnants of existing repositories
-	${CLI} run rake scm:find_unassociated
+	${CLI} run rake scm:find_unassociated || true
 fi
 
 # set various settings
