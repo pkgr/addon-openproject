@@ -43,6 +43,15 @@ ${CLI} config:set SECRET_TOKEN="$secret_token"
 # migrate
 ${CLI} run rake ${rake_commands} || true
 
+# set SUBFOLDER_LOCATION
+relative_root=$(${CLI} config:get SUBFOLDER_LOCATION || echo "")
+if [ -n "$relative_root" ]; then
+	${CLI} config:set RAILS_RELATIVE_URL_ROOT="${relative_root}"
+
+	# Need to re-compile assets due to changed paths
+	${CLI} run rake assets:precompile
+fi
+
 # set various settings
 sys_api_key=$(${CLI} config:get SYS_API_KEY)
 web_protocol="$(${CLI} config:get SERVER_PROTOCOL)"
