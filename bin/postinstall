@@ -43,10 +43,12 @@ ${CLI} config:set SECRET_TOKEN="$secret_token"
 # migrate
 ${CLI} run rake ${rake_commands} || true
 
-# set SUBFOLDER_LOCATION
-relative_root=$(${CLI} config:get SUBFOLDER_LOCATION || echo "")
-if [ -n "$relative_root" ]; then
-	${CLI} config:set RAILS_RELATIVE_URL_ROOT="${relative_root}"
+# set relative root url from configured server prefix
+relative_root=$(${CLI} config:get SERVER_PATH_PREFIX)
+# If there's already a relative root configured, we need to compile assets, as well.
+current_relative_root=$(${CLI} config:get RAILS_RELATIVE_URL_ROOT || echo "")
+if [ -n "$relative_root" ] || [ -n "$current_relative_root" ]; then
+	${CLI} config:set RAILS_RELATIVE_URL_ROOT="${relative_root:0:length-1}"
 
 	# Need to re-compile assets due to changed paths
 	${CLI} run rake assets:precompile
