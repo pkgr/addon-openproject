@@ -47,7 +47,7 @@ ${CLI} run rake ${rake_commands} || true
 relative_root=$(${CLI} config:get SERVER_PATH_PREFIX || echo "/")
 # If there's already a relative root configured, we need to compile assets, as well.
 current_relative_root=$(${CLI} config:get RAILS_RELATIVE_URL_ROOT || echo "")
-if [ -n "$relative_root" ] || [ -n "$current_relative_root" ]; then
+if [ "$relative_root" != "/" ] || [ "$current_relative_root/" != "$relative_root" ]; then
 	${CLI} config:set RAILS_RELATIVE_URL_ROOT="$(echo "${relative_root}" | sed "s|/$||")"
 
 	# Need to re-compile assets due to changed paths
