@@ -52,6 +52,8 @@ if [ "$relative_root" != "/" ] || [ "$current_relative_root/" != "$relative_root
 
 	# Need to re-compile assets due to changed paths
 	${CLI} run rake assets:precompile
+
+	chmod -R a+r "${APP_HOME}/public/assets/"
 fi
 
 # set various settings
