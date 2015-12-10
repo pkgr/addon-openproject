@@ -44,7 +44,7 @@ ${CLI} config:set SECRET_TOKEN="$secret_token"
 ${CLI} run rake ${rake_commands} || true
 
 # set relative root url from configured server prefix
-relative_root=$(${CLI} config:get SERVER_PATH_PREFIX)
+relative_root=$(${CLI} config:get SERVER_PATH_PREFIX || echo "/")
 # If there's already a relative root configured, we need to compile assets, as well.
 current_relative_root=$(${CLI} config:get RAILS_RELATIVE_URL_ROOT || echo "")
 if [ -n "$relative_root" ] || [ -n "$current_relative_root" ]; then
