@@ -72,11 +72,11 @@ if [ -e "${APP_HOME}/lib/tasks/scm.rake" ]; then
 		# migrate previous repositories with reposman to managed
 		${CLI} run rake scm:migrate:managed["file://${SVN_REPOSITORIES}"] || true
 
-		${CLI} run rake scm:set_checkout_url["subversion=${web_url}/svn${relative_root}"] || true
+		${CLI} run rake scm:set_checkout_url["subversion=${web_url}${relative_root}svn"] || true
 	fi
 
 	if [ -n "$GIT_REPOSITORIES" ]; then
-		${CLI} run rake scm:set_checkout_url["git=${web_url}/git${relative_root}"] || true
+		${CLI} run rake scm:set_checkout_url["git=${web_url}${relative_root}git"] || true
 	fi
 
 	# Output any remnants of existing repositories
