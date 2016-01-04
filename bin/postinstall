@@ -40,47 +40,12 @@ ${CLI} config:set SECRET_KEY_BASE="$secret_token"
 # set SECRET_TOKEN env variable for backwards compatibility
 ${CLI} config:set SECRET_TOKEN="$secret_token"
 
-# migrate
-${CLI} run rake ${rake_commands} || true
+# Use the OpenProject internal setup in one environment task
+${CLI} run rake "${rake_commands} packager:postinstall"
 
-# set relative root url from configured server prefix
-relative_root=$(${CLI} config:get SERVER_PATH_PREFIX || echo "/")
-# If there's already a relative root configured, we need to compile assets, as well.
-current_relative_root=$(${CLI} config:get RAILS_RELATIVE_URL_ROOT || echo "")
-if [ "$relative_root" != "/" ] || [ "$current_relative_root/" != "$relative_root" ]; then
-	${CLI} config:set RAILS_RELATIVE_URL_ROOT="$(echo "${relative_root}" | sed "s|/$||")"
-
-	# Need to re-compile assets due to changed paths
-	${CLI} run rake assets:precompile
-
-	chmod -R a+r "${APP_HOME}/public/assets/"
-fi
-
-# set various settings
-sys_api_key=$(${CLI} config:get SYS_API_KEY)
-web_protocol="$(${CLI} config:get SERVER_PROTOCOL)"
-web_hostname="$(${CLI} config:get SERVER_HOSTNAME)"
-web_url="${web_protocol}://${web_hostname}"
-${CLI} run rake setting:set[host_name=${web_hostname},protocol=${web_protocol},sys_api_enabled=1,sys_api_key=${sys_api_key}] 1>/dev/null
-
-# Avoid errors on versions < 5.0
-if [ -e "${APP_HOME}/lib/tasks/scm.rake" ]; then
-	SVN_REPOSITORIES=$(${CLI} config:get SVN_REPOSITORIES || echo "")
-	GIT_REPOSITORIES=$(${CLI} config:get GIT_REPOSITORIES || echo "")
-
-	if [ -n "$SVN_REPOSITORIES" ]; then
-		# migrate previous repositories with reposman to managed
-		${CLI} run rake scm:migrate:managed["file://${SVN_REPOSITORIES}"] || true
-
-		${CLI} run rake scm:set_checkout_url["subversion=${web_url}${relative_root}svn"] || true
-	fi
-
-	if [ -n "$GIT_REPOSITORIES" ]; then
-		${CLI} run rake scm:set_checkout_url["git=${web_url}${relative_root}git"] || true
-	fi
-
-	# Output any remnants of existing repositories
-	${CLI} run rake scm:find_unassociated || true
+# Allow OpenProject to perform custom initialization steps in the context of this installer
+if [ -e "${APP_HOME}/packaging/scripts/postinstall" ]; then
+	source "${APP_HOME}/packaging/scripts/postinstall"
 fi
 
 # scale
