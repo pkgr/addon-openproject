@@ -40,6 +40,9 @@ ${CLI} config:set SECRET_KEY_BASE="$secret_token"
 # set SECRET_TOKEN env variable for backwards compatibility
 ${CLI} config:set SECRET_TOKEN="$secret_token"
 
+# Allow other tasks to run before the environment is loaded
+${CLI} run rake "packager:before_postinstall"
+
 # Use the OpenProject internal setup in one environment task
 ${CLI} run rake "${rake_commands} packager:postinstall"
 
