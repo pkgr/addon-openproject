@@ -8,7 +8,7 @@ CLI="${APP_NAME}"
 
 # Check for custom gems
 custom_gemfile=$(${CLI} config:get CUSTOM_PLUGIN_GEMFILE || echo "")
-if [ -e "${custom_gemfile}"]; then
+if [ -n "$custom_gemfile" ] && [ -f "$custom_gemfile" ]; then
 
 	# Need to override the frozen setting for the vendored gems
 	${CLI} run bundle config --local frozen 0
