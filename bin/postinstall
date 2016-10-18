@@ -45,7 +45,7 @@ web_concurrency=$(${CLI} config:get WEB_CONCURRENCY || echo "2")
 ${CLI} config:set WEB_CONCURRENCY=${web_concurrency}
 
 # set web timeout
-web_timeout=$(${CLI} config:get WEB_TIMEOUT || echo "15")
+web_timeout=$(${CLI} config:get WEB_TIMEOUT || echo "300")
 ${CLI} config:set WEB_TIMEOUT=${web_timeout}
 
 # set SECRET_KEY_BASE env variable
