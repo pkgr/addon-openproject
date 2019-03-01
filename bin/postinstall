@@ -17,8 +17,18 @@ if [ -n "$custom_gemfile" ] && [ -f "$custom_gemfile" ]; then
 	${CLI} run bundle install
 
 	# Mark assets for recompilation in the OpenProject postinstall rake step
-	${CLI} config:set REBUILD_ASSETS="true"
+	${CLI} config:set MUST_REBUILD_ASSETS="true"
 
+fi
+
+# If we don't have to rebuild assets, set EXECJS_RUNTIME
+must_rebuild=$(${CLI} config:get MUST_REBUILD_ASSETS || echo "")
+if [ -n "$must_rebuild" ]; then
+	echo "Assets were requested to be rebuilt. Installing node dependencies..."
+        ${CLI} config:set EXECJS_RUNTIME=""
+	npm install
+else
+        ${CLI} config:set EXECJS_RUNTIME="Disabled"
 fi
 
 rake_commands="db:migrate db:seed"
