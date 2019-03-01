@@ -1,3 +1,21 @@
 #!/bin/bash
 
+case $(wiz_fact "osfamily") in
+	"redhat")
+		required_dependencies="poppler-utils unrtf tesseract catdoc"
+		missing_dependencies=""
+		for dep in $required_dependencies ; do
+			if ! wiz_check_package "$dep" ; then
+				missing_dependencies="$missing_dependencies $dep"
+			fi
+		done
+		if [ "$missing_dependencies" != "" ]; then
+			echo "INFO: Executing 'yum install -y $missing_dependencies'..."
+			if ! yum install -y $missing_dependencies &>/dev/null ; then
+				echo "WARNING: Unable to install some of the dependencies required for fulltext search: $missing_dependencies"
+			fi
+		fi
+		;;
+esac
+
 exit 0
