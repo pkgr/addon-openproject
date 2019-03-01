@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -e
+
+. ${INSTALLER_DIR}/wizard
+
 case $(wiz_fact "osfamily") in
 	"redhat")
 		required_dependencies="poppler-utils unrtf tesseract catdoc"
