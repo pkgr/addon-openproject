@@ -74,6 +74,9 @@ ${CLI} run rake "packager:before_postinstall"
 # Use the OpenProject internal setup in one environment task
 ${CLI} run rake "${rake_commands} packager:postinstall"
 
+# For some reason RHEL8 creates files with chmod 0600
+find "${APP_HOME}/public" -type f -exec chmod 0644 {} \;
+
 # Allow OpenProject to perform custom initialization steps in the context of this installer
 if [ -e "${APP_HOME}/packaging/scripts/postinstall" ]; then
 	source "${APP_HOME}/packaging/scripts/postinstall"
